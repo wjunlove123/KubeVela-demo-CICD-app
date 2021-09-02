@@ -1,0 +1,32 @@
+// app.yaml
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: KubeVela-demo-CICD-app
+spec:
+  components:
+    - name: KubeVela-demo-CICD-app-web
+      type: webservice
+      properties:
+        image: somefive/kubevela-demo-cicd-app
+        imagePullPolicy: Always
+        port: 8080
+      traits:
+        - type: scaler
+          properties:
+            replicas: 5
+        - type: rollout
+          properties:
+            rolloutBatches:
+              - replicas: 1
+              - replicas: 1
+              - replicas: 3
+            batchPartition: 1
+        - type: labels
+          "properties":
+            "jenkins-build-commit": GIT_COMMIT
+        - type: ingress
+          properties:
+            domain: http://kubevela-demo-cicd-app.cf7c0ed25b151437ebe1ef58efc29bca4.us-west-1.alicontainer.com/
+            http:
+              "/": 8088
